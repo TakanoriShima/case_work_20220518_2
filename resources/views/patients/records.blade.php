@@ -13,10 +13,10 @@
     <!-- 相談記録のキーワード検索 -->
     <div class="row">
         <div class="col-sm-6 offset-sm-3">
-            {!! Form::open(['route' => ['records.search', $patient->id, $record->id], 'method' => 'get']) !!}
+            {!! Form::open(['route' => ['records.search', $patient->id], 'method' => 'get']) !!}
                 <div class="form-group">
                     {!! Form::label('keyword', 'キーワード') !!}
-                    {!! Form::text('keyword', old('content'), ['class' => 'form-control']) !!}
+                    {!! Form::search('keyword', $keyword, ['class' => 'form-control']) !!}
                 </div>
                 {!! Form::submit('検索', ['class' => 'btn btn-secondary btn-block']) !!}
             {!! Form::close() !!}
@@ -47,6 +47,6 @@
     {{ $records->links('pagination::bootstrap-4') }}
     
     @else
-        <h2 class="mt-5 text-center text-danger">※相談記録はまだありません</h2>
+        <h2 class="mt-5 text-center text-danger">※相談記録はあまりません</h2>
     @endif
 @endsection           

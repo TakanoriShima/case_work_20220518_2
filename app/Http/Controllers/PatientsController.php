@@ -18,8 +18,9 @@ class PatientsController extends Controller
     {
         // Patientモデルを使って全利用者を昇順で取得
         $patients = Patient::orderBy('id', 'asc')->paginate(10);
+        $keyword = '';
         // viewの呼び出し
-        return view('top', compact('patients'));
+        return view('top', compact('patients', 'keyword'));
     }
 
     /**
@@ -318,7 +319,7 @@ class PatientsController extends Controller
     public function search(Request $request){
         
         // validation
-        $this->validate($request, ['keyword' => 'required']);
+        // $this->validate($request, ['keyword' => 'required']);
         
         // 入力された検索キーワードを取得
         $keyword = $request->input('keyword');
@@ -328,12 +329,17 @@ class PatientsController extends Controller
                     ->orWhere('name', 'like', '%' . $keyword . '%')
                     ->orWhere('disease_name', 'like', '%' . $keyword . '%')
                     ->paginate(10);
+                    
+        if($keyword === null){
+            $flash_message = null;
+        }else{
+            // フラッシュメッセージのセット
+            $flash_message = '検索キーワード: 『' . $keyword . '』に' . $patients->count() . '件ヒットしました';
+        }
        
-        // フラッシュメッセージのセット
-        $flash_message = '検索キーワード: 『' . $keyword . '』に' . $patients->count() . '件ヒットしました';
         
         // view の呼び出し
-        return view('/top', compact('patients', 'flash_message'));
+        return view('/top', compact('patients', 'flash_message', 'keyword'));
     }
 
 }

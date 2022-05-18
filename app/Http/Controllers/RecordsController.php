@@ -16,12 +16,14 @@ class RecordsController extends Controller
     public function index($id)
     {
         // 注目する利用者とその相談記録一覧の情報を取得
+        // session(['keyword' => null]);
         $patient = Patient::find($id);
         $records = $patient->records()->paginate(10);
+        $keyword = '';
         
         // view の呼び出し
         // ある利用者とその相談記録一覧を表示させる
-        return view('patients.records', compact('patient', 'records'));
+        return view('patients.records', compact('patient', 'records', 'keyword'));
     }
 
     /**
@@ -192,27 +194,32 @@ class RecordsController extends Controller
     }
     
     // 相談記録のキーワード検索
-    public function search(Request $request){
+    public function search(Request $request, $id){
+
+        // $records = $patient->records()->get();
+        // session(['flash_message' => null]);
+        // validation
+        // $this->validate($request, ['keyword' => 'required']);
         
         // 注目する利用者とその相談記録一覧の情報を取得
         $patient = Patient::find($id);
-        $records = $patient->records()->get();
-        
-        // validation
-        $this->validate($request, ['keyword' => 'required']);
-        
         // 入力された検索キーワードを取得
         $keyword = $request->input('keyword');
-        $record_name = $record->user->name;
+        // $record_name = $record->user->name;
 
         // 検索
-        $records = Record::where('content','like', '%' . $keyword . '%')->orWhere($record_name, 'like', '%' . $keyword . '%')->paginate(10);
+        // $records = Record::where('content','like', '%' . $keyword . '%')->orWhere($record_name, 'like', '%' . $keyword . '%')->paginate(10);
+        $records = Record::where('content','like', '%' . $keyword . '%')->where('patient_id', $id)->paginate(10);
         
-        // フラッシュメッセージのセット
-        $flash_message = '検索キーワード: 『' . $keyword . '』に' . $records->count() . '件ヒットしました';
+        if($keyword === null){
+            $flash_message = null;
+        }else{
+            // フラッシュメッセージのセット
+            $flash_message = '検索キーワード: 『' . $keyword . '』に' . count($records) . '件ヒットしました';
+        }
         
         // view の呼び出し
-        return view('top', compact('patients.records', 'flash_message'));
+        return view('patients.records', compact('patient', 'flash_message', 'keyword', 'records'));
 
     }
 }
